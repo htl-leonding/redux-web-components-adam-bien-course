@@ -267,3 +267,36 @@ console.log(store.getState());
 
 image:first-program-3-subscription.png[]
 
+=== Redux DevTools
+
+https://github.com/zalmoxisus/redux-devtools-extension
+
+to install use this link for chrome store +
+https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
+
+
+Now add a second parameter:
+
+[source,javascript]
+----
+const store = createStore(multiply, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+----
+
+.When the icon in the toolbar gets green, the extension is activated (-> reload)
+image:redux-dev-tools-for-chrome.png[]
+
+
+.Add a value
+[source,javascript]
+----
+store.dispatch({
+    type: 'M',
+    payload: 3
+})
+----
+
+image:redux-dev-tools-2.png[]
+image:redux-dev-tools-3.png[]
+
+
+
