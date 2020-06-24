@@ -71,6 +71,9 @@ npm i redux
 }
 ----
 
+////
+// snowpack is not needed because redux now provides a working redux.mjs-file
+
 ----
 npm install --save-dev snowpack
 ----
@@ -114,10 +117,32 @@ npx snowpack
 
 image:install-snowpack.png[]
 
-====
 
 .Redux converted to ES6-module
 image:redux-converted-to-es6-module.png[]
+
+=== Copy the Redux-Lib
+
+----
+cd ../events
+mkdir src/lib
+cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
+----
+
+----
+|-- events
+|   `-- src
+|       |-- app.js
+|       |-- index.html
+|       |-- lib
+|       |   `-- redux.js
+|       `-- style.css
+----
+
+////
+
+====
+
 
 
 === Activate Module System
@@ -140,12 +165,12 @@ image:redux-converted-to-es6-module.png[]
 
 // <.> type="module" acitvates the module system
 
-=== Copy the Redux-Lib
+=== Copy the redux.mjs - File
 
 ----
 cd ../events
 mkdir src/lib
-cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
+cp ../dependencies/node_modules/redux/es/redux.mjs ../events/src/lib
 ----
 
 ----
@@ -158,7 +183,87 @@ cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
 |       `-- style.css
 ----
 
+=== Redux
+
+Redux is a central Singleton, where we can store json- or javascript-objects.
+These objects can only modified by functuons, called reducers.
+We can subscribe to notifications of this store.
 
 
+== First Program
 
+[source,javascript]
+----
+import { createStore } from "./lib/redux.mjs";
+
+const multiply = ( state = 21, action) => {
+    console.log(state, action);
+    return state * action.payload;
+}
+
+const store = createStore(multiply);
+
+const initial = store.getState();
+console.log('initial', initial);
+----
+
+.Problem: the first 'action' is a init-action, so the action-type has to be determined
+image:first-program.png[]
+
+[source,javascript]
+----
+import { createStore } from "./lib/redux.mjs";
+
+const multiply = ( state = 21, action) => {
+    console.log(state, action);
+    if (action.type === 'M') {
+        return state * action.payload;
+    }
+    return state;
+}
+
+const store = createStore(multiply);
+
+const initial = store.getState();
+console.log('initial', initial);
+----
+
+.only the state is displayed
+image:first-program-2.png[]
+
+=== Create a Subscription
+
+[source,javascript]
+----
+import { createStore } from "./lib/redux.mjs";
+
+const multiply = ( state = 21, action) => {
+    console.log(state, action);
+    if (action.type === 'M') {
+        return state * action.payload;
+    }
+    return state;
+}
+
+const store = createStore(multiply);
+
+// subscribe to changes
+store.subscribe(_ => console.log('state changed', store.getState())); // <.>
+
+const initial = store.getState();
+console.log('initial', initial);
+
+// changes the value
+store.dispatch({ // <.>
+    type: 'M',
+    payload: 2
+})
+
+console.log(store.getState());
+----
+
+<.> subscribe to changes
+<.> changes the value
+
+image:first-program-3-subscription.png[]
 
