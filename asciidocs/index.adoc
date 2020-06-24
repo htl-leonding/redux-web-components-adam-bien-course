@@ -1,0 +1,164 @@
+= Course Notes for "Apps with Web Components, redux and lit-html"
+firstname lastname
+1.0.0, 2020-06-25: Trainer: Adam Bien
+ifndef::imagesdir[:imagesdir: images]
+//:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
+:sourcedir: ../src/main/java
+:icons: font
+:sectnums:    // Nummerierung der Überschriften / section numbering
+:toc: left
+
+//Need this blank line after ifdef, don't know why...
+ifdef::backend-html5[]
+
+// https://fontawesome.com/v4.7.0/icons/
+icon:file-text-o[link=https://raw.githubusercontent.com/htl-leonding-college/asciidoctor-docker-template/master/asciidocs/{docname}.adoc] ‏ ‏ ‎
+icon:github-square[link=https://github.com/htl-leonding-college/asciidoctor-docker-template] ‏ ‏ ‎
+icon:home[link=https://htl-leonding.github.io/]
+endif::backend-html5[]
+
+// print the toc here (not at the default position)
+//toc::[]
+
+
+== GitHub-Repo
+
+https://github.com/htl-leonding/redux-web-components-adam-bien-course
+
+== Preparations
+
+=== Install browser-sync
+
+----
+npm install -g browser-sync
+----
+
+=== Install Snowpack
+
+https://www.snowpack.dev/
+
+For installing redux; is a intelligent builder
+Converts the proprietary module system from redux and lit-html and convert that to es6-module.
+
+.Click, for the install-details
+[%collapsible]
+====
+[source,shell]
+----
+mkdir dependencies
+cd dependencies
+npm init -y
+npm i redux
+----
+
+.package.json
+[source,yaml]
+----
+{
+  "name": "dependencies",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redux": "^4.0.5"
+  }
+}
+----
+
+----
+npm install --save-dev snowpack
+----
+
+[source,yaml]
+----
+{
+  "name": "dependencies",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redux": "^4.0.5"
+  },
+  "devDependencies": {
+    "snowpack": "^2.5.4"
+  }
+}
+----
+
+==== Add a simple js-File
+
+.src/app.js
+[source,javascript]
+----
+import 'redux/dist/redux.js'
+----
+
+image:add-app-js-for-snowpack.png[]
+
+.Convert redux to es6-module
+----
+npx snowpack
+----
+
+image:install-snowpack.png[]
+
+====
+
+.Redux converted to ES6-module
+image:redux-converted-to-es6-module.png[]
+
+
+=== Activate Module System
+
+[source,javascript]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <code>hello</code>
+    <script src="app.js" type="module"></script> // <.>
+</body>
+</html>
+----
+
+// <.> type="module" acitvates the module system
+
+=== Copy the Redux-Lib
+
+----
+cd ../events
+mkdir src/lib
+cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
+----
+
+----
+|-- events
+|   `-- src
+|       |-- app.js
+|       |-- index.html
+|       |-- lib
+|       |   `-- redux.js
+|       `-- style.css
+----
+
+
+
+
+
