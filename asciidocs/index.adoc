@@ -299,4 +299,50 @@ image:redux-dev-tools-2.png[]
 image:redux-dev-tools-3.png[]
 
 
+=== Create a First Component
+
+.NewEvent,js
+[source,javascript]
+----
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        this.innerHTML = "simple string"
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+.app.js
+[source,javascript]
+----
+import './NewEvent.js'
+----
+
+.index.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <a-newevent />  <.>
+    <script src="app.js" type="module"></script>
+</body>
+</html>
+----
+
+<.> Usage of the new tag
+
+
+
+
+
+
+
+
 
