@@ -33,6 +33,62 @@ https://github.com/htl-leonding/redux-web-components-adam-bien-course
 npm install -g browser-sync
 ----
 
+=== Create your first app
+
+----
+|-- events
+    `-- src
+        |-- app.js
+        |-- index.html
+        `-- style.css // <.>
+----
+
+<.> style.css is empty at the moment
+
+.index.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[my template]</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <code>hello</code>
+    <script src="app.js"></script>
+</body>
+</html>
+----
+
+
+.app.js
+[source,javascript]
+----
+console.log("Hello Web Standards");
+----
+
+Start browser-sync
+
+```
+browser-sync start -s src -f src -b "google chrome" --no-notify
+```
+
+.https://www.browsersync.io/docs/command-line[browsersync options]
+|===
+|Option |Description
+|-s
+|Start a Local server from the `src`-directory
+|-f
+|File paths to watch - here: `src`
+|-b
+|Choose which browser should be auto-opened
+|===
+
+.Result in Browser
+image:primer-browser.png[]
+
 === Install Snowpack
 
 https://www.snowpack.dev/
@@ -71,7 +127,8 @@ npm i redux
 }
 ----
 
-////
+
+
 // snowpack is not needed because redux now provides a working redux.mjs-file
 
 ----
@@ -139,13 +196,12 @@ cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
 |       `-- style.css
 ----
 
-////
+
 
 ====
 
-
-
 === Activate Module System
+
 
 [source,javascript]
 ----
@@ -163,9 +219,15 @@ cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
 </html>
 ----
 
-// <.> type="module" acitvates the module system
+<.> `type="module"` acitvates the module system. In Node.js the native module system is *CommonJS*.
+To activate the newer *ES6 module system* you have to use *module*.
+
+
+
 
 === Copy the redux.mjs - File
+
+TIP: We do not need Snowpack at the moment, because you find the js-redux-file in `/node_modules/redux/es/redux.mjs`
 
 ----
 cd ../events
@@ -179,9 +241,28 @@ cp ../dependencies/node_modules/redux/es/redux.mjs ../events/src/lib
 |       |-- app.js
 |       |-- index.html
 |       |-- lib
-|       |   `-- redux.js
+|       |   `-- redux.mjs
 |       `-- style.css
 ----
+
+..mjs-files - module javascript
+****
+
+.MJS file
+
+* mjs an extension for EcmaScript modules
+* An MJS file is a source code file containing an ES Module (ECMAScript Module) for use with a Node.js application.
+* MJS files are written in JavaScript, and may also use the .JS extension outside of the Node.js context.
+* ES Modules allow web and application developers to organize code into smaller reusable components.
+
+ECMAScript 6 (ES6) introduced the specification for ES Modules, providing a standard for implementing modules in JavaScript. As of 2018, all major web browsers support ES Modules.
+
+However, the popularity of modularized JavaScript pre-dates ES6. Node.js, a JavaScript runtime environment, used CommonJS as the specification for modules. *Because so many existing applications were built with CommonJS, when Node.js added support for native ES modules, it controversially introduced the MJS file extension to differentiate the two and prevent applications from breaking*.
+
+https://stackoverflow.com/a/57557669/9818338
+****
+
+
 
 === Redux
 
@@ -339,8 +420,27 @@ import './NewEvent.js'
 <.> Usage of the new tag
 
 
+=== Structuring of the App
 
+* In the highest level we use a functional structure.
+* In the creation-folder are created
+** boundary-
+** entity- and
+** control-packages
 
+----
+events
+|-- app.js
+|-- creation
+|   |-- boundary
+|   |   `-- NewEvent.js
+|   |-- control
+|   `-- entity
+|-- index.html
+|-- lib
+|   `-- redux.mjs
+`-- style.css
+----
 
 
 
