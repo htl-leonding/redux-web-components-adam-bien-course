@@ -89,16 +89,20 @@ browser-sync start -s src -f src -b "google chrome" --no-notify
 .Result in Browser
 image:primer-browser.png[]
 
+////
 === Install Snowpack
 
 https://www.snowpack.dev/
 
-For installing redux; is a intelligent builder
-Converts the proprietary module system from redux and lit-html and convert that to es6-module.
+For installing redux; Snowpack is a intelligent builder which
+converts the proprietary module system from redux and lit-html to es6-modules.
 
-.Click, for the install-details
-[%collapsible]
-====
+//.Click, for the install-details
+//[%collapsible]
+//====
+
+First we make a new "project"-folder beside `events`:
+
 [source,shell]
 ----
 mkdir dependencies
@@ -126,7 +130,6 @@ npm i redux
   }
 }
 ----
-
 
 
 // snowpack is not needed because redux now provides a working redux.mjs-file
@@ -178,7 +181,8 @@ image:install-snowpack.png[]
 .Redux converted to ES6-module
 image:redux-converted-to-es6-module.png[]
 
-=== Copy the Redux-Lib
+
+==== Copy the Redux-Lib
 
 ----
 cd ../events
@@ -196,38 +200,50 @@ cp ../dependencies/web_modules/redux/dist/redux.js ./src/lib
 |       `-- style.css
 ----
 
+// comment: it doesn't work with snowpack
+
+// ====
+
+////
 
 
-====
+=== Use the redux.mjs - file
 
-=== Activate Module System
+==== Install redux in a separate "project"
 
+First we make a new "project"-folder beside `events`:
 
-[source,javascript]
+[source,shell]
 ----
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>[WebStandards template]</title>
-    <link rel="stylesheet" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-    <code>hello</code>
-    <script src="app.js" type="module"></script> // <.>
-</body>
-</html>
+mkdir dependencies
+cd dependencies
+npm init -y
+npm i redux
 ----
 
-<.> `type="module"` acitvates the module system. In Node.js the native module system is *CommonJS*.
-To activate the newer *ES6 module system* you have to use *module*.
+.package.json
+[source,yaml]
+----
+{
+  "name": "dependencies",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redux": "^4.0.5"
+  }
+}
+----
 
 
+==== Copy the redux.mjs - File
 
-
-=== Copy the redux.mjs - File
-
-TIP: We do not need Snowpack at the moment, because you find the js-redux-file in `/node_modules/redux/es/redux.mjs`
 
 ----
 cd ../events
@@ -250,7 +266,7 @@ cp ../dependencies/node_modules/redux/es/redux.mjs ../events/src/lib
 
 .MJS file
 
-* mjs an extension for EcmaScript modules
+* mjs is an extension for EcmaScript modules
 * An MJS file is a source code file containing an ES Module (ECMAScript Module) for use with a Node.js application.
 * MJS files are written in JavaScript, and may also use the .JS extension outside of the Node.js context.
 * ES Modules allow web and application developers to organize code into smaller reusable components.
@@ -264,10 +280,36 @@ https://stackoverflow.com/a/57557669/9818338
 
 
 
+
+=== Activate Module System
+
+.index.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <code>hello</code>
+    <script src="app.js" type="module"></script> <.>
+</body>
+</html>
+----
+
+<.> `type="module"` activates the module system. In Node.js the native module system is *CommonJS*.
+To activate the newer *ES6 module system* you have to use *module*.
+
+
+
+
 === Redux
 
 Redux is a central Singleton, where we can store json- or javascript-objects.
-These objects can only modified by functuons, called reducers.
+These objects can only modified by functions, called reducers.
 We can subscribe to notifications of this store.
 
 
@@ -275,7 +317,7 @@ We can subscribe to notifications of this store.
 
 [source,javascript]
 ----
-import { createStore } from "./lib/redux.mjs";
+import { createStore } from "./lib/redux.js";
 
 const multiply = ( state = 21, action) => {
     console.log(state, action);
@@ -376,6 +418,42 @@ store.dispatch({
 })
 ----
 
+.app.js
+[source,javascript]
+----
+import { createStore } from "./lib/redux.mjs";
+
+const multiply = ( state = 21, action) => {
+    console.log(state, action);
+    if (action.type === 'M') {
+        return state * action.payload;
+    }
+    return state;
+}
+
+const store = createStore(multiply, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+// subscribe to changes
+store.subscribe(_ => console.log('state changed', store.getState()));
+
+const initial = store.getState();
+console.log('initial', initial);
+
+// change the value
+store.dispatch({
+    type: 'M',
+    payload: 2
+})
+store.dispatch({
+    type: 'M',
+    payload: 3
+})
+
+
+console.log(store.getState());
+----
+
+
 image:redux-dev-tools-2.png[]
 image:redux-dev-tools-3.png[]
 
@@ -441,6 +519,68 @@ events
 |   `-- redux.mjs
 `-- style.css
 ----
+
+==== Import lit-html
+
+Open a terminal
+
+----
+mkdir dependencies
+cd dependencies
+npm init -y
+npm i lit-html
+npm i --save-deps snowpack
+mkdir src
+echo "import 'lit-html/lit-html.js'" > src/app.js
+snowpack build
+ cp ./web_modules/lit-html/lit-html.js ../events/src/lib/
+----
+
+
+.NewEvent.js
+[source,javascript]
+----
+import { render, html } from "../../lib/lit-html.js"; // <.>
+
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        this.innerHTML = html`  // <.>
+          <input placeholder="name" />
+          <button>create</button>
+        `;
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> imports the functions `render` and `html` from lit-html
+<.> uses the function `html`
+
+.The template is an object - we will have to render it
+image:less006-lit-html-object.png[]
+
+
+[source,javascript]
+----
+import { render, html } from "../../lib/lit-html.js";
+
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        const template = html`  // <.>
+          <input placeholder="name" />
+          <button>create</button>
+        `;
+        render(template, this);  // <.>
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> assign the template object to a variable ...
+<.> ... and render the template object
+
 
 
 
