@@ -1,5 +1,6 @@
 import { render, html } from "../../lib/lit-html.js";
 import AirElement from "../../AirElement.js";
+import {createEvent} from "../control/EventControl.js";
 
 class NewEvent extends AirElement {
 
@@ -7,7 +8,6 @@ class NewEvent extends AirElement {
         super();
         this.event = {};
     }
-
 
     view() {
         return html`
@@ -17,14 +17,15 @@ class NewEvent extends AirElement {
         `;
     }
 
-    newEvent() {
-        console.log('-------- saving', this.event);
-    }
-
     onUserInput({target: { name, value }}) {
         console.log(name, value);
         this.event[name] = value;
     }
+
+    newEvent() {
+        createEvent(this.event)
+    }
+
 }
 
 customElements.define('a-newevent', NewEvent);
