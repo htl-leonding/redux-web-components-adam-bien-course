@@ -313,7 +313,7 @@ These objects can only modified by functions, called reducers.
 We can subscribe to notifications of this store.
 
 
-== First Program
+== The Program
 
 [source,javascript]
 ----
@@ -751,7 +751,7 @@ class EventsOverview extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
         <h2>hello,overview</h2>
-        `
+        `;
     }
 }
 
@@ -790,15 +790,131 @@ import './overview/boundary/EventsOverview.js'; // <.>
 NOTE: Don't use `<a-events-overview />` because some browsers doesn't recognize it.
 
 
+image:less009-result-in-browser.png[]
+
+
+NOTE: you can add the custom tags in index.html to customElements in IntelliJ (right-click)
+
+
+=== Extract the Common Logic to a "Base" Component
+
+==== Same Code for Rendering Custom Elements
+
+.use lit-html in the custom element
+[source,javascript]
+----
+import { html, render } from "../../lib/lit-html.js";
+
+class EventsOverview extends HTMLElement {
+
+    connectedCallback() {
+        const template = html`  <.>
+        <h2>hello,overview</h2>
+        `;
+        render(template, this); <.>
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
+
+<.> add `html`
+<.> add `render(...)`
+
+Now it is the same like before - we use `html` and `render(...)`.
+We can create an generic custom element -> AirElement.
+
+==== Introduce AirElement
+
+Maybe BaseElement would be a better name.
+
+.AirElement.js
+[source,javascript]
+----
+import { render } from './lib/lit-html.js'
+
+export default class AirElement extends HTMLElement {  // <4>
+
+    connectedCallback() {
+        const template = this.view(); // <2>
+        render(template, this);  // <3>
+    }
+
+    view() { } // <1>
+
+}
+----
+
+<.> create an abstract method
+<.> the abstract method returns the template
+<.> ... which we will render
+<.> don't forget to export the class
+
+.NewEvent.js
+[source,javascript]
+----
+import { render, html } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+
+class NewEvent extends AirElement { // <.>
+
+    constructor() {
+        super();
+        this.event = {};
+    }
+
+
+    view() {   // <.>
+        return html`
+          <input name="eventname" @change=${e=>this.onUserInput(e)} placeholder="eventname" />
+          <input name="description" @change=${e=>this.onUserInput(e)} placeholder="description" />
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+     // <.>
+    }
+
+    newEvent() {
+        console.log('-------- saving', this.event);
+    }
+
+    onUserInput({target: { name, value }}) {
+        console.log(name, value);
+        this.event[name] = value;
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> Now, we derive from AirElement
+<.> We implement the abstract method
+<.> we don't have to render the template here, because this will be done in AirElement
+
+.EventsOverview.js
+[source,javascript]
+----
+import { html, render } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+
+class EventsOverview extends AirElement {
+
+    view() {
+        return html`
+        <h2>hello,overview</h2>
+        `;
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
+
+Now it will work like before.
 
 
 
+[source,javascript]
+----
 
-
-
-
-
-
-
+----
 
 

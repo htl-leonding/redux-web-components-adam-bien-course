@@ -1,6 +1,7 @@
-import {render, html} from "../../lib/lit-html.js";
+import { render, html } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
 
-class NewEvent extends HTMLElement {
+class NewEvent extends AirElement {
 
     constructor() {
         super();
@@ -8,13 +9,12 @@ class NewEvent extends HTMLElement {
     }
 
 
-    connectedCallback() {
-        const template = html`
+    view() {
+        return html`
           <input name="eventname" @change=${e=>this.onUserInput(e)} placeholder="eventname" />
           <input name="description" @change=${e=>this.onUserInput(e)} placeholder="description" />
           <button @click="${_ => this.newEvent()}">create</button>
         `;
-        render(template, this);
     }
 
     newEvent() {
