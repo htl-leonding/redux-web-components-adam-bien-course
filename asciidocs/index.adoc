@@ -965,14 +965,137 @@ customElements.define('a-newevent', NewEvent);
 <.> import createEvent(...)
 <.> invoke createEvent(...)
 
+image:less011-result-in-browser.png[]
+
+The createEvent-function is a perfect place to dispatch redux-actions.
+
+==== Introduce Redux
+
+Because EventsOverview and NewEvent share the super class AirElement, we can use AirElement.
+In Redux we need https://redux.js.org/basics/actions[actions] and https://redux.js.org/basics/reducers[reducers].
+
+On every modification of the state of the redux store, we will rerender all components.
+
+.AirElement.js
+[source,javascript]
+----
+import { render } from './lib/lit-html.js'
+import {createStore} from "./lib/redux.mjs"; // <.>
+
+const events = (state = {}, action) => {  // <.>
+    console.log(state, action);
+    return state;
+}
+const store = createStore(events);  // <.>
+
+export default class AirElement extends HTMLElement {
+
+    connectedCallback() {
+        store.subscribe(_ => this.triggerViewUpdate()); // <.>
+        this.triggerViewUpdate(); // <.>
+    }
+
+    triggerViewUpdate() {  // <.>
+        const template = this.view();
+        render(template, this);
+    }
+
+    view() { }
+
+}
+
+export {store}; // <.>
+----
+
+<.> import redux
+<.> create a reducer
+<.> create a store
+<.> on every change invoke `triggerViewUpdate()`
+<.> for initialization
+<.> renders the view. lit-html is smart, detects all changes and rerender them
+<.> add another export
+
+.EventControl.js
+[source,javascript]
+----
+import {store} from "../../AirElement.js" // <.>
+
+const createEvent = payload => {
+    store.dispatch({  // <.>
+        type: 'NEW_EVENT_CREATED',
+        payload
+    });
+}
+
+export { createEvent };
+----
+
+<.> import the store
+<.> dispatch the payload
+
+.NewEvent.js
+[source,javascript]
+----
+import { render, html } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+import {createEvent} from "../control/EventControl.js";
+
+class NewEvent extends AirElement {
+
+    constructor() {
+        super();
+        this.event = {};
+    }
+
+    view() {
+        console.log('UPDATED');
+        return html`
+          <input name="eventname"
+                 @change=${e=>this.onUserInput(e)}
+                 placeholder="eventname" />
+          <input name="description"
+                 @change=${e=>this.onUserInput(e)}
+                 placeholder="description" />
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+    }
+
+    onUserInput({target: { name, value }}) {
+        console.log(name, value);
+        this.event[name] = value;
+    }
+
+    newEvent() {
+        createEvent(this.event)
+    }
+
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+.EventsOverview.js
+[source,javascript]
+----
+import { html, render } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
 
 
+class EventsOverview extends AirElement {
+
+    view() {
+        console.log('UPDATING +1');
+        return html`
+        <h2>hello,overview</h2>
+        `;
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
 
 
-
-
-
-
+image:less011-redux-result-in-browser.png[]
 
 
 
@@ -981,5 +1104,25 @@ customElements.define('a-newevent', NewEvent);
 ----
 
 ----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
