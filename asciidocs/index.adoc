@@ -520,7 +520,7 @@ events
 `-- style.css
 ----
 
-==== Import lit-html
+==== Install lit-html
 
 Open a terminal
 
@@ -536,6 +536,8 @@ snowpack build
  cp ./web_modules/lit-html/lit-html.js ../events/src/lib/
 ----
 
+According to https://twitter.com/AdamBien/status/1283265671955132417[AdamBien] it is sufficient to copy
+the entire folder.
 
 .NewEvent.js
 [source,javascript]
@@ -581,8 +583,30 @@ customElements.define('a-newevent', NewEvent);
 <.> assign the template object to a variable ...
 <.> ... and render the template object
 
+.Now we have additional functionality
+image:less006-lit-html-object-render.png[]
 
+.NewEvent.js
+[source,javascript]
+----
+import {render, html} from "../../lib/lit-html.js";
 
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        const template = html`
+          <input placeholder="name" />
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+        render(template, this);
+    }
 
+    newEvent() {
+        console.log('-------- button clicked');
+    }
+}
 
+customElements.define('a-newevent', NewEvent);
+----
+
+image:less006-lit-html-button-click.png[]
 
