@@ -539,6 +539,10 @@ snowpack build
 According to https://twitter.com/AdamBien/status/1283265671955132417[AdamBien] it is sufficient to copy
 the entire folder.
 
+=== Input Elements and Change Listener
+
+==== Usage of `html`
+
 .NewEvent.js
 [source,javascript]
 ----
@@ -563,6 +567,8 @@ customElements.define('a-newevent', NewEvent);
 image:less006-lit-html-object.png[]
 
 
+==== Rendering the template object
+
 [source,javascript]
 ----
 import { render, html } from "../../lib/lit-html.js";
@@ -580,11 +586,15 @@ class NewEvent extends HTMLElement {
 customElements.define('a-newevent', NewEvent);
 ----
 
-<.> assign the template object to a variable ...
+<.> assign the html-code as object to a variable ...
 <.> ... and render the template object
 
-.Now we have additional functionality
+.The rendered template object
 image:less006-lit-html-object-render.png[]
+
+
+==== Now we add additional functionality
+
 
 .NewEvent.js
 [source,javascript]
@@ -609,4 +619,186 @@ customElements.define('a-newevent', NewEvent);
 ----
 
 image:less006-lit-html-button-click.png[]
+
+==== Add @change to input-element
+
+[source,javascript]
+----
+import {render, html} from "../../lib/lit-html.js";
+
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        const template = html`
+          <input @change=${e=>this.onUserInput(e)} placeholder="name" /> // <.>
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+        render(template, this);
+    }
+
+    newEvent() {
+        console.log('-------- button clicked');
+    }
+
+    onUserInput(e) {  // <.>
+        console.log(e);
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> add `@change=${e=>this.onUserInput(e)}`
+<.> create a function to log the event
+
+image:less007-event-in-console.png[]
+
+The event has a target, which is basically the input - field. The target owns (beside others) two properties:
+name (is currently empty) and value (the text in the input field)
+
+So we are providing a name-property to the input field.
+
+We are also extracting the name and the value in the function.
+
+==== Extract Parts from the Event
+
+[source,javascript]
+----
+import {render, html} from "../../lib/lit-html.js";
+
+class NewEvent extends HTMLElement {
+    connectedCallback() {
+        const template = html`
+          <input name="eventname"  <.>
+                 @change=${e=>this.onUserInput(e)}
+                 placeholder="name"
+          />
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+        render(template, this);
+    }
+
+    newEvent() {
+        console.log('-------- button clicked');
+    }
+
+    onUserInput({target: { name, value }}) {   <.>
+        console.log(name, value); <.>
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> provide a name attribute
+<.> extract parts of the event-object
+<.> log to the console
+
+==== Create a Custom Event-Object
+
+[source,javascript]
+----
+import {render, html} from "../../lib/lit-html.js";
+
+class NewEvent extends HTMLElement {
+
+    constructor() {
+        super();
+        this.event = {};  <.>
+    }
+
+
+    connectedCallback() {
+        const template = html`
+          <input name="eventname" @change=${e=>this.onUserInput(e)} placeholder="eventname" />
+          <input name="description" @change=${e=>this.onUserInput(e)} placeholder="description" />  <.>
+          <button @click="${_ => this.newEvent()}">create</button>
+        `;
+        render(template, this);
+    }
+
+    newEvent() {
+        console.log('-------- saving', this.event);  <.>
+    }
+
+    onUserInput({target: { name, value }}) {
+        console.log(name, value);
+        this.event[name] = value;  <.>
+    }
+}
+
+customElements.define('a-newevent', NewEvent);
+----
+
+<.> add a constructor and create an custom event-object
+<.> add a second input field (description)
+<.> imagine, the event object is saved in this function
+<.> add each data item to the event-object
+
+image:less007-custom-event-object.png[]
+
+
+=== Creation of an Overview Web Component
+
+==== Create a new Overview Component
+
+image:less009-project-structure.png[]
+
+.EventsOverview.js
+[source,javascript]
+----
+class EventsOverview extends HTMLElement {
+
+    connectedCallback() {
+        this.innerHTML = `
+        <h2>hello,overview</h2>
+        `
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
+
+.app.js
+[source,javascript]
+----
+import './creation/boundary/NewEvent.js';
+import './overview/boundary/EventsOverview.js'; // <.>
+----
+
+<.> add the js-File
+
+.index.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <a-newevent></a-newevent>
+    <a-events-overview></a-events-overview> <.>
+    <script src="app.js" type="module"></script>
+</body>
+</html>
+----
+
+<.> use the custom element on your page.
+
+NOTE: Don't use `<a-events-overview />` because some browsers doesn't recognize it.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
