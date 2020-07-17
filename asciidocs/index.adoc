@@ -1097,6 +1097,91 @@ customElements.define('a-events-overview', EventsOverview);
 
 image:less011-redux-result-in-browser.png[]
 
+=== Sending Events to Reduc Store
+
+==== Reactivate Redux tools
+
+.AirElement.js
+[source,javascript]
+----
+import { render } from './lib/lit-html.js'
+import {createStore} from "./lib/redux.mjs";
+
+// reducer
+const events = (state = {}, action) => {
+    console.log(state, action);
+    return state;
+}
+const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()); // <.>
+
+export default class AirElement extends HTMLElement {
+
+    connectedCallback() {
+        store.subscribe(_ => this.triggerViewUpdate());
+        this.triggerViewUpdate();
+    }
+
+    triggerViewUpdate() {
+        const template = this.view();
+        render(template, this);
+    }
+
+    view() { }
+
+}
+
+export {store};
+----
+
+<.> add the initialization sequence
+
+image:less012-redux-devtools.png[]
+
+The current state is just an empty object
+
+.AirElement.js
+[source,javascript]
+----
+const events = (state = {events:[]}, action) => { // <.>
+    console.log(state, action);
+    return state;
+}
+----
+
+<.> add an empty array of events to the state
+
+You can see this in the redux devtools immediately.
+
+image:less012-redux-devtools-events-array.png[]
+
+
+
+.AirElement.js
+[source,javascript]
+----
+...
+const events = (state = {events:[]}, action) => {
+    const {type,payload} = action;
+    switch (type) {
+        case 'NEW_EVENT_CREATED':
+            return {
+                events: state.events.concat(payload)
+            }
+    }
+    console.log(state, action);
+    return state;
+}
+const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+...
+----
+
+image:less012-redux-devtools-results.png[]
+
+
+
+
+
+
 
 
 
@@ -1104,10 +1189,6 @@ image:less011-redux-result-in-browser.png[]
 ----
 
 ----
-
-
-
-
 
 
 
