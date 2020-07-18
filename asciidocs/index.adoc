@@ -1471,23 +1471,58 @@ export { createEvent };
 ----
 
 
+=== Deep Copy Refactoring
 
+Now we use the Decorator pattern for the deep copy of the events. The deepCopy-function
+should not stick to every action-type. The deep copy should be done before.
 
-
-
-
-
+.store.js
 [source,javascript]
 ----
+import {createStore} from "./lib/redux.mjs";
+import events from "./creation/entity/EventsReducer.js";
 
+const deepCopy = input => JSON.parse(JSON.stringify(input));  // <.>
+
+const copyingEvent = (state, action) => {   // <.>
+    return deepCopy(events(state, action));
+}
+
+const store = createStore(copyingEvent, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()); // <.>
+export default store;
 ----
 
+<.> move the deepCopy from EventsReducer.js to here
+<.> create a `copyingEvent`
+<.> export the copyingEvent
 
 
+
+.EventsReducer.js
 [source,javascript]
 ----
+const NEW_EVENT_CREATED = 'NEW_EVENT_CREATED';
 
+// reducer
+const events = (state = {events: []}, action) => {
+    const {type, payload} = action;
+    switch (type) {
+        case NEW_EVENT_CREATED:
+            return {
+                events: state.events.concat(payload) // <.>
+            };
+    }
+    console.log(state, action);
+    return state;
+}
+
+export default events;
+export {NEW_EVENT_CREATED};
 ----
+
+<.> remove the deep copy
+
+
 
 [source,javascript]
 ----
