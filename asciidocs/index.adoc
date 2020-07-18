@@ -1712,40 +1712,116 @@ index.html
 
 [source,javascript]
 ----
+...
+view() {
+    console.log('UPDATED');
+    return html`
+    <form>
+      ${this.input({name:'link'})}
+      ${this.input({name:'eventname'})}
+      ${this.input({name:'description'})}
+      <button class="button" @click="${e => this.newEvent(e)}">create</button> // <.>
+    </form>
+    `;
+}
 
+input({name, placeholder=name}) {
+    return html`
+    <label class="label">${placeholder}    // <.>
+        <input required class="input is-primary"  name="${name}" placeholder="${placeholder}" @change=${e => this.onUserInput(e)} /> // <.>
+    </label>
+    `;
+}
+...
 ----
 
+image:less025-result-in-browser.png[]
 
 
+=== Application Layout with Flexbox
 
+.index.html
+[source,html,]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="bulma.css">
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<main> <.>
+    <a-newevent></a-newevent>
+    <a-events-overview></a-events-overview>
+</main>
+<script src="app.js" type="module"></script>
+</body>
+</html>
+----
 
+.style.css
+[source,css]
+----
+main {  <.>
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20%;
+}
 
+a-newevent form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+----
+
+image:less026-result-in-browser.png[]
+
+=== Filter Component
+
+.src/filter/boundary/EventsFilter.js
 [source,javascript]
 ----
+import AirElement from "../../AirElement.js";
+import {html} from "../../lib/lit-html.js";
 
+
+class EventsFilter extends AirElement {
+
+    view() {
+        return html`
+            <input placeholder="keyword">
+        `
+    }
+
+}
+
+customElements.define('a-events-filter',EventsFilter);
 ----
 
+.EventsOverview.js
 [source,javascript]
 ----
-
+...
+view() {
+    const eventList = this.state.events;
+    console.log('UPDATING +1', this.state);
+    return html`
+    <a-events-filter></a-events-filter> // <.>
+    <ol>
+     ${eventList.map(({ eventname, description}) => html`
+         <li>${eventname} => ${description}</li>
+     `)}
+    </ol>
+    `;
+}
+...
 ----
 
-
-
-
-
-
-[source,javascript]
-----
-
-----
-
-[source,javascript]
-----
-
-----
-
-
+image:less027-result-in-browser.png[]
 
 
 
