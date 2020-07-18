@@ -1178,12 +1178,130 @@ const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.
 image:less012-redux-devtools-results.png[]
 
 
+=== Sharing State between Components
+
+The easist way is to provide AirElement with the state.
+
+.AirElement.js
+[source,javascript]
+----
+...
+export default class AirElement extends HTMLElement {
+
+    constructor() {  // <.>
+        super();
+        this.state = {};
+    }
+
+    connectedCallback() {
+        store.subscribe(_ => this.triggerViewUpdate());
+        this.triggerViewUpdate();
+    }
+
+    triggerViewUpdate() {
+        this.state = store.getState();  // <.>
+        const template = this.view();
+        render(template, this);
+    }
+
+    view() { }
+
+}
+...
+----
+
+<.> create a state - variable ...
+<.> ... and assign the actual store-content to her when rendering
+
+.EventsOverview.js
+[source,javascript]
+----
+import { html, render } from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+
+
+class EventsOverview extends AirElement {
+
+    view() {
+        console.log('UPDATING +1',this.state);  // <.>
+        return html`
+        <h2>hello,overview</h2>
+        `;
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
+
+image:less013-result-in-browser.png[]
+
+
+=== Rendering a List
+
+.EventsOverview.js
+[source,javascript]
+----
+import {html, render} from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+
+
+class EventsOverview extends AirElement {
+
+    view() {
+        const eventList = this.state.events;
+        console.log('UPDATING +1', this.state);
+        return html`
+        <ol>
+         ${eventList.map(({ name, description}) => html`
+             <li>${name} => ${description}</li>
+         `)}
+        </ol>
+        `;
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
+----
+
+image:less014-result-in-browser.png[]
+
+It doesn't work!
+
+==== Fixing the reference-error (now copying)
+
+[source,javascript]
+----
+import {store} from "../../AirElement.js"
+
+const createEvent = event => {
+    const payload = Object.assign({}, event); // <.>
+    store.dispatch({
+        type: 'NEW_EVENT_CREATED',
+        payload
+    });
+}
+
+export { createEvent };
+----
+
+<.> Copies the event, instead of referencing
+
+image:less015-result-in-browser.png[]
 
 
 
 
 
 
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
 
 [source,javascript]
 ----
