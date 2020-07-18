@@ -1676,13 +1676,39 @@ a-newevent form{
 
 image:less024-result-in-browser.png[]
 
+=== Bulma - External CSS Library
 
+https://bulma.io/
 
+Bulma comes with a single css dependency - there is no javascript involved
 
-[source,javascript]
+.open a new terminal and install Bulma
+----
+cd dependencies
+npm install bulma
+cp node_modules/bulma/css/bulma.css ../events/src/
 ----
 
+index.html
+[source,html]
 ----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>[WebStandards template]</title>
+    <link rel="stylesheet" href="bulma.css">  <.>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <a-newevent></a-newevent>
+    <a-events-overview></a-events-overview>
+    <script src="app.js" type="module"></script>
+</body>
+</html>
+----
+
+<.> import Bulma first, so style.css can overwrite it
 
 [source,javascript]
 ----
