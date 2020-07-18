@@ -1,10 +1,12 @@
 const deepCopy = input => JSON.parse(JSON.stringify(input));
 
+const NEW_EVENT_CREATED = 'NEW_EVENT_CREATED';
+
 // reducer
 const events = (state = {events:[]}, action) => {
     const {type,payload} = action;
     switch (type) {
-        case 'NEW_EVENT_CREATED':
+        case NEW_EVENT_CREATED:
             return deepCopy({
                 events: state.events.concat(payload)
             });
@@ -14,3 +16,4 @@ const events = (state = {events:[]}, action) => {
 }
 
 export default events;
+export { NEW_EVENT_CREATED };
