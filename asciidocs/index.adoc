@@ -1635,6 +1635,8 @@ input({id, name=id, placeholder=name}) {  // <.>
 
 === Input Labels
 
+We introduce labels and get rid of the id.
+
 [source,javascript]
 ----
 ....
@@ -1660,15 +1662,19 @@ input({name, placeholder=name}) {
 ...
 ----
 
+=== Form Layout with Flexbox
 
-
-
-[source,javascript]
+src/.style.css
+[source,css]
+----
+a-newevent form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
 ----
 
-----
-
-
+image:less024-result-in-browser.png[]
 
 
 
