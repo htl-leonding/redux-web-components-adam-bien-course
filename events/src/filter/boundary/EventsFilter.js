@@ -1,5 +1,6 @@
 import AirElement from "../../AirElement.js";
 import {html} from "../../lib/lit-html.js";
+import {onFilterChanged} from "../control/FilterControl.js";
 
 
 class EventsFilter extends AirElement {
@@ -13,6 +14,7 @@ class EventsFilter extends AirElement {
 
     onFilter({target: {value}}) {
         console.log('...', value);
+        onFilterChanged(value);
     }
 }
 

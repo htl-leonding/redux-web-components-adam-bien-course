@@ -1852,13 +1852,27 @@ customElements.define('a-events-filter',EventsFilter);
 image:less028-result-in-browser.png[]
 
 
-=== Introducing the Reducer
+=== Introducing the Filter Reducer
 
 
-
+.src/filter/entity/FilterReducer.js
 [source,javascript]
 ----
+const FILTER_CHANGED = 'FILTER_CHANGED';
 
+const filter = (state = {filter: {}}, action) => {
+    const {type, payload} = action;
+    switch (type) {
+        case FILTER_CHANGED:
+            return {
+                filter: payload
+            }
+    }
+    return state;
+}
+
+export default filter;
+export {FILTER_CHANGED};
 ----
 
 
