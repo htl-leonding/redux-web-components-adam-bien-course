@@ -1379,14 +1379,97 @@ export default store;
 
 image:less017-result-in-browser.png[]
 
-
-
-
-
+.EventControl.js
 [source,javascript]
 ----
+import store from "../../store.js"; // <.>
 
+const createEvent = payload => {
+    store.dispatch({
+        type: 'NEW_EVENT_CREATED',
+        payload
+    });
+}
+
+export { createEvent };
 ----
+
+=== Extract Businesslogic
+
+.src/store.js
+[source,javascript]
+----
+import {createStore} from "./lib/redux.mjs";
+import events from "./creation/entity/EventsReducer.js";
+
+const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+export default store;
+----
+
+.src/creation/entity/EventsReducer.js
+[source,javascript]
+----
+const deepCopy = input => JSON.parse(JSON.stringify(input));
+
+// reducer
+const events = (state = {events:[]}, action) => {
+    const {type,payload} = action;
+    switch (type) {
+        case 'NEW_EVENT_CREATED':
+            return deepCopy({
+                events: state.events.concat(payload)
+            });
+    }
+    console.log(state, action);
+    return state;
+}
+
+export default events;
+----
+
+=== Introduce a Constant for a String (Action Type)
+
+.EventsReducer.js
+[source,javascript]
+----
+const deepCopy = input => JSON.parse(JSON.stringify(input));
+
+const NEW_EVENT_CREATED = 'NEW_EVENT_CREATED';  // <.>
+
+// reducer
+const events = (state = {events:[]}, action) => {
+    const {type,payload} = action;
+    switch (type) {
+        case NEW_EVENT_CREATED:   // <.>
+            return deepCopy({
+                events: state.events.concat(payload)
+            });
+    }
+    console.log(state, action);
+    return state;
+}
+
+export default events;
+export { NEW_EVENT_CREATED };
+----
+
+.EventControl.js
+[source,javascript]
+----
+import store from "../../store.js";
+import {NEW_EVENT_CREATED} from "../entity/EventsReducer.js";
+
+
+const createEvent = payload => {
+    store.dispatch({
+        type: NEW_EVENT_CREATED,
+        payload
+    });
+}
+
+export { createEvent };
+----
+
 
 
 
