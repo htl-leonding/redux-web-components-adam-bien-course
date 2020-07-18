@@ -4,7 +4,7 @@ rm -rf -v $BUILD_DIR # else plantuml diagrams won't be rebuilt
 cp -r -p -v asciidocs $BUILD_DIR
 # when you want to include source-code, so uncomment the follwing command with the correct path of the sourcecode
 #cp -r -p -v src $BUILD_DIR
-docker run --rm \
+docker run -t --rm \
            -v ${PWD}/$BUILD_DIR:/documents \
            asciidoctor/docker-asciidoctor asciidoctor-pdf \
            -r asciidoctor-diagram \
@@ -23,4 +23,3 @@ docker run --rm \
 
 # https://asciidoctor.org/docs/asciidoctor-pdf/
 
-AsciiDoctor - Dokumentation schreibenkann Spass machen!
