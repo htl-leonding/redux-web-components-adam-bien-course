@@ -1522,24 +1522,74 @@ export {NEW_EVENT_CREATED};
 
 <.> remove the deep copy
 
+=== Input Validation
+
+We want to prevent empty events w/o any content
+
+.NewEvent.js
+[source,html]
+----
+...
+<input required name="eventname" @change=${e=>this.onUserInput(e)} placeholder="eventname" />
+...
+----
+
+The standard html5 validation - required - does not work, w/o a form
+
+[source,html]
+----
+...
+<form>
+  <input required name="eventname" @change=${e => this.onUserInput(e)} placeholder="eventname" />
+  <input required name="description" @change=${e => this.onUserInput(e)} placeholder="description" />
+  <button @click="${_ => this.newEvent()}">create</button>
+</form>
+...
+----
+
+Now it works, but after submitting the form, the form reloads and the event-overview is deleted.
 
 
+.NewEvent.js
 [source,javascript]
 ----
+...
+    view() {
+        console.log('UPDATED');
+        return html`
+        <form>
+          <input required name="eventname" @change=${e => this.onUserInput(e)} placeholder="eventname" />
+          <input required name="description" @change=${e => this.onUserInput(e)} placeholder="description" />
+          <button @click="${e => this.newEvent(e)}">create</button>  // <.>
+        </form>
+        `;
+    }
 
+    onUserInput({target: {name, value}}) {
+        console.log(name, value);
+        this.event[name] = value;
+    }
+
+    newEvent(e) {
+        const { target: { form } } = e     // <.>
+        e.preventDefault();  // <.>
+        form.reportValidity();  // <.>
+        if (form.checkValidity()) { // <.>
+            createEvent(this.event);
+        }
+    }
+...
 ----
 
+<.> add the click-event as parameter
+<.> get a reference to the form
+<.> disable the standard behaviour (ie reloading the form)
+<.> re-enable the Validation (which is also a standard behaviour)
+<.> only create a new event, when the validation is passed
 
 
-[source,javascript]
-----
 
-----
 
-[source,javascript]
-----
-
-----
 
 
 
