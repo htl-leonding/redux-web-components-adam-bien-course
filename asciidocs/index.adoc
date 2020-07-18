@@ -1288,15 +1288,34 @@ export { createEvent };
 
 image:less015-result-in-browser.png[]
 
-
-
-
-
-
+.AirElement.js
 [source,javascript]
 ----
+...
+const deepCopy = input => JSON.parse(JSON.stringify(input));  // <.>
 
+// reducer
+const events = (state = {events:[]}, action) => {
+    const {type,payload} = action;
+    switch (type) {
+        case 'NEW_EVENT_CREATED':
+            return deepCopy({    // <.>
+                events: state.events.concat(payload)
+            });
+    }
+    console.log(state, action);
+    return state;
+}
+...
 ----
+
+<.> create a new function for deep copying
+<.> instead of a reference, provide a copy
+
+image:less016-result-in-browser.png[]
+
+
+
 
 [source,javascript]
 ----
