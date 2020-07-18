@@ -974,6 +974,8 @@ The createEvent-function is a perfect place to dispatch redux-actions.
 Because EventsOverview and NewEvent share the super class AirElement, we can use AirElement.
 In Redux we need https://redux.js.org/basics/actions[actions] and https://redux.js.org/basics/reducers[reducers].
 
+NOTE: There is a good article: https://www.robinwieruch.de/javascript-reducer[What is a Reducer in JavaScript/React/Redux?]
+
 On every modification of the state of the redux store, we will rerender all components.
 
 .AirElement.js
@@ -1097,7 +1099,7 @@ customElements.define('a-events-overview', EventsOverview);
 
 image:less011-redux-result-in-browser.png[]
 
-=== Sending Events to Reduc Store
+=== Sending Events to Redux Store
 
 ==== Reactivate Redux tools
 
@@ -1253,7 +1255,7 @@ class EventsOverview extends AirElement {
         return html`
         <ol>
          ${eventList.map(({ name, description}) => html`
-             <li>${name} => ${description}</li>
+             <li>${eventname} => ${description}</li>
          `)}
         </ol>
         `;
@@ -1269,6 +1271,8 @@ It doesn't work!
 
 ==== Fixing the reference-error (now copying)
 
+// This solution works, but it's more structured to copy the event in the reducer
+////
 [source,javascript]
 ----
 import {store} from "../../AirElement.js"
@@ -1287,6 +1291,7 @@ export { createEvent };
 <.> Copies the event, instead of referencing
 
 image:less015-result-in-browser.png[]
+////
 
 .AirElement.js
 [source,javascript]
@@ -1314,6 +1319,109 @@ const events = (state = {events:[]}, action) => {
 
 image:less016-result-in-browser.png[]
 
+
+=== Refactoring Redux
+
+First, we will factor out the redux logic from AirElement in a dedicated file.
+
+.AirElement.js
+[source,javascript]
+----
+import { render } from './lib/lit-html.js'
+import store from "./store.js";
+
+export default class AirElement extends HTMLElement {
+
+    constructor() {
+        super();
+        this.state = {};
+    }
+
+    connectedCallback() {
+        store.subscribe(_ => this.triggerViewUpdate());
+        this.triggerViewUpdate();
+    }
+
+    triggerViewUpdate() {
+        this.state = store.getState();
+        const template = this.view();
+        render(template, this);
+    }
+
+    view() { }
+
+}
+export {store};
+----
+
+.store.js
+[source,javascript]
+----
+import {createStore} from "./lib/redux.mjs";
+
+const deepCopy = input => JSON.parse(JSON.stringify(input));
+
+// reducer
+const events = (state = {events:[]}, action) => {
+    const {type,payload} = action;
+    switch (type) {
+        case 'NEW_EVENT_CREATED':
+            return deepCopy({
+                events: state.events.concat(payload)
+            });
+    }
+    console.log(state, action);
+    return state;
+}
+const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+export default store;
+----
+
+image:less017-result-in-browser.png[]
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
 
 
 
