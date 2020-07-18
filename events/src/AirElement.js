@@ -17,12 +17,18 @@ const store = createStore(events, window.__REDUX_DEVTOOLS_EXTENSION__ && window.
 
 export default class AirElement extends HTMLElement {
 
+    constructor() {
+        super();
+        this.state = {};
+    }
+
     connectedCallback() {
         store.subscribe(_ => this.triggerViewUpdate());
         this.triggerViewUpdate();
     }
 
     triggerViewUpdate() {
+        this.state = store.getState();
         const template = this.view();
         render(template, this);
     }
@@ -30,5 +36,4 @@ export default class AirElement extends HTMLElement {
     view() { }
 
 }
-
 export {store};
