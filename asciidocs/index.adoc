@@ -1587,7 +1587,7 @@ Now it works, but after submitting the form, the form reloads and the event-over
 <.> re-enable the Validation (which is also a standard behaviour)
 <.> only create a new event, when the validation is passed
 
-=== Template Refactoring
+=== Template Rendering in a Method
 
 .NewEvent.js
 [source,javascript]
@@ -1633,11 +1633,35 @@ input({id, name=id, placeholder=name}) {  // <.>
 <.> the new input function. The parameters have default values.
 
 
+=== Input Labels
 
 [source,javascript]
 ----
+....
+view() {
+    console.log('UPDATED');
+    return html`
+    <form>
+      ${this.input({name:'link'})}
+      ${this.input({name:'eventname'})}
+      ${this.input({name:'description'})}
+      <button @click="${e => this.newEvent(e)}">create</button>
+    </form>
+    `;
+}
 
+input({name, placeholder=name}) {
+    return html`
+    <label>${placeholder}
+        <input required name="${name}" placeholder="${placeholder}" @change=${e => this.onUserInput(e)} />
+    </label>
+    `;
+}
+...
 ----
+
+
+
 
 [source,javascript]
 ----
