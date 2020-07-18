@@ -1587,6 +1587,122 @@ Now it works, but after submitting the form, the form reloads and the event-over
 <.> re-enable the Validation (which is also a standard behaviour)
 <.> only create a new event, when the validation is passed
 
+=== Template Refactoring
+
+.NewEvent.js
+[source,javascript]
+----
+...
+<form>
+  <input required name="eventname" @change=${e => this.onUserInput(e)} placeholder="eventname" />
+  <input required name="description" @change=${e => this.onUserInput(e)} placeholder="description" />
+  ...
+</form>
+...
+----
+
+Because the input fields have the same structure, we create a function for the input
+
+
+
+.NewEvent.js
+[source,javascript]
+----
+...
+view() {
+    console.log('UPDATED');
+    return html`
+    <form>
+      ${this.input({id:'link'})}  // <.>
+      ${this.input({id:'eventname'})}
+      ${this.input({id:'description'})}
+      <button @click="${e => this.newEvent(e)}">create</button>
+    </form>
+    `;
+}
+
+input({id, name=id, placeholder=name}) {  // <.>
+    return html`
+    <input required id ="${id}" name="${name}" placeholder="${placeholder}" @change=${e => this.onUserInput(e)} />
+    `;
+}
+...
+----
+
+<.> using the new input function for the input-elements
+<.> the new input function. The parameters have default values.
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
 
 
 
