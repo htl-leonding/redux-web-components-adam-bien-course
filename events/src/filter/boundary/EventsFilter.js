@@ -6,10 +6,14 @@ class EventsFilter extends AirElement {
 
     view() {
         return html`
-            <input placeholder="keyword">
+            <input class="input" placeholder="keyword" @keyup="${e => this.onFilter(e)}">
         `
     }
 
+
+    onFilter({target: {value}}) {
+        console.log('...', value);
+    }
 }
 
 customElements.define('a-events-filter',EventsFilter);
