@@ -1876,31 +1876,87 @@ export {FILTER_CHANGED};
 ----
 
 
+=== Filter Control Creation
 
-
-
-
+.src/filter/entity/FilterControl.js
 [source,javascript]
 ----
+import store from '../../store.js';
+import {FILTER_CHANGED} from "../entity/FilterReducer.js";
 
+const onFilterChanged = payload => {
+
+    store.dispatch({
+        type: FILTER_CHANGED,
+        payload
+    })
+};
+
+export {onFilterChanged};
 ----
 
+.EventsFilter.js
 [source,javascript]
 ----
+import AirElement from "../../AirElement.js";
+import {html} from "../../lib/lit-html.js";
+import {onFilterChanged} from "../control/FilterControl.js"; // <.>
 
+
+class EventsFilter extends AirElement {
+
+    view() {
+        return html`
+            <input class="input" placeholder="keyword" @keyup="${e => this.onFilter(e)}">
+        `
+    }
+
+
+    onFilter({target: {value}}) {
+        console.log('...', value);
+        onFilterChanged(value); // <.>
+    }
+}
+
+customElements.define('a-events-filter',EventsFilter);
 ----
 
+image:less031-action-is-already-dispatched.png[]
 
+The actions are dispatched, but the state of the store didn't change (you can see it in the
+redux tool under the tab "State")
 
+image:less031-state-in-redux-tools.png[]
 
+Beside the events could also be a state of the filter.
 
+=== Combining Reducers
 
-
-
+.store.js
 [source,javascript]
 ----
+import {createStore,combineReducers} from "./lib/redux.mjs";  // <.>
+import events from "./creation/entity/EventsReducer.js";
+import filter from "./filter/entity/FilterReducer.js";  // <.>
 
+const deepCopy = input => JSON.parse(JSON.stringify(input));
+
+const combinedReducer = combineReducers({events, filter});  // <.>
+
+const copyingEvent = (state, action) => {
+    return deepCopy(combinedReducer(state, action));  // <.>
+}
+
+const store = createStore(copyingEvent, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+export default store;
 ----
+
+<.> add combineReducers
+<.> import the FilterReducer
+<.> because it is only possible to dispatch one action, we combine the actions
+<.> we can now dispatch the combined reducer
+
+image:less031-filter-is-also-in-store.png[]
 
 [source,javascript]
 ----
