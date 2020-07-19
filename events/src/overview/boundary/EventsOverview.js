@@ -1,6 +1,9 @@
 import {html, render} from "../../lib/lit-html.js";
 import AirElement from "../../AirElement.js";
 import '../../filter/boundary/EventsFilter.js'
+import matchesCriteria from "../entity/Filter.js";
+
+
 
 class EventsOverview extends AirElement {
 
@@ -10,7 +13,9 @@ class EventsOverview extends AirElement {
         return html`
         <a-events-filter></a-events-filter>
         <ol>
-         ${eventList.map(({ eventname, description}) => html`
+         ${eventList
+            .filter(e => matchesCriteria(e))
+            .map(({ eventname, description}) => html`
              <li>${eventname} => ${description}</li>
          `)}
         </ol>
