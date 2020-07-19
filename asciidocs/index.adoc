@@ -1958,22 +1958,81 @@ export default store;
 
 image:less031-filter-is-also-in-store.png[]
 
+IMPORTANT: Unfortunately, the filter broke.
+
+image:less031-error-in-filter.png[]
+
+=== Slot State extraction for Convenience
+
+
+.AirElement.js
 [source,javascript]
 ----
+import { render } from './lib/lit-html.js'
+import store from "./store.js";
 
+export default class AirElement extends HTMLElement {
+
+    constructor() {
+        super();
+        this.state = {};
+    }
+
+    connectedCallback() {
+        store.subscribe(_ => this.triggerViewUpdate());
+        this.triggerViewUpdate();
+    }
+
+    triggerViewUpdate() {
+        this.state = this.extractState(store.getState());  // <.>
+        const template = this.view();
+        render(template, this);
+    }
+
+    extractState(reduxState) { // <.>
+        return reduxState;
+    }
+
+    view() { }
+
+}
+export {store};
 ----
 
-
-
-
-
-
-
-
+.EventsOverview.js
 [source,javascript]
 ----
+import {html, render} from "../../lib/lit-html.js";
+import AirElement from "../../AirElement.js";
+import '../../filter/boundary/EventsFilter.js'
 
+class EventsOverview extends AirElement {
+
+    view() {
+        const eventList = this.state.events;
+        return html`
+        <a-events-filter></a-events-filter>
+        <ol>
+         ${eventList.map(({ eventname, description}) => html`
+             <li>${eventname} => ${description}</li>
+         `)}
+        </ol>
+        `;
+    }
+
+    extractState(redux) {  // <.>
+        return redux.events;
+    }
+}
+
+customElements.define('a-events-overview', EventsOverview);
 ----
+
+<.> We overwrite the function "extractState"
+
+
+
+
 
 [source,javascript]
 ----

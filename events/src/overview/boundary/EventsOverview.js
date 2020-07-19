@@ -15,6 +15,10 @@ class EventsOverview extends AirElement {
         </ol>
         `;
     }
+
+    extractState(redux) {
+        return redux.events;
+    }
 }
 
 customElements.define('a-events-overview', EventsOverview);
