@@ -2194,6 +2194,41 @@ mocha.run();
 
 image:less035-first-test.png[]
 
+=== An Empty function Test
+
+First we download the libraries into a local lib-folder.
+
+----
+mkdir test/lib
+cd test/lib
+curl -L -O https://unpkg.com/chai/chai.js
+curl -L -O https://unpkg.com/mocha/mocha.js
+curl -L -O https://unpkg.com/mocha/mocha.css
+----
+
+
+
+[source,javascript]
+----
+import matchesCriteria from "./overview/entity/Filter.js";
+
+mocha.setup('bdd');
+const assert = chai.assert;
+
+describe('#overview.entity.Filter', function () {
+    it('matchesCriteria_true_emptyEvent', function () {
+        assert.isTrue(matchesCriteria({},''));
+    });
+})
+
+mocha.run();
+----
+
+image:less036-result-in-browser.png[]
+
+
+
+
 
 
 [source,javascript]
@@ -2201,6 +2236,106 @@ image:less035-first-test.png[]
 
 ----
 
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
+
+
+
+
+
+
+
+[source,javascript]
+----
+
+----
+
+[source,javascript]
+----
+
+----
 
 
 
