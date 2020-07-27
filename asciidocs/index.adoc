@@ -2206,8 +2206,42 @@ curl -L -O https://unpkg.com/mocha/mocha.js
 curl -L -O https://unpkg.com/mocha/mocha.css
 ----
 
+.test.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Mocha Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="lib/mocha.css"/>
+</head>
+<body>
+    <div id="mocha"></div>
 
+    <script src="lib/chai.js"></script>
+    <script src="lib/mocha.js"></script>
 
+    <script src="test.js" type="module"></script>
+</body>
+</html>
+----
+
+.src/overview/entity/Filter.js
+[source,javascript]
+----
+const matchesCriteria = (event, filter) => {
+    console.log(event);
+    if (!filter) {
+        return true;
+    }
+    return false;
+};
+export default matchesCriteria;
+----
+
+.test.js
 [source,javascript]
 ----
 import matchesCriteria from "./overview/entity/Filter.js";
