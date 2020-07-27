@@ -2194,7 +2194,7 @@ mocha.run();
 
 image:less035-first-test.png[]
 
-=== An Empty function Test
+=== An Empty Function Test
 
 First we download the libraries into a local lib-folder.
 
@@ -2261,68 +2261,149 @@ mocha.run();
 image:less036-result-in-browser.png[]
 
 
+=== Unit Testing matchesCriteria
 
+The test is working with empty filter, but every other filter will break the test.
 
-
-
-[source,javascript]
-----
-
-----
+==== matchesCriteria_true_emptyEvent
 
 [source,javascript]
 ----
-
+...
+describe('#overview.entity.Filter', function () {
+    it('matchesCriteria_true_emptyEvent', function () {
+        assert.isTrue(matchesCriteria({},'abc')); // <.>
+    });
+})
+...
 ----
 
+image:less037-broken-test.png[]
 
+==== matchesCriteria_true_webEvent_and_emptyFilter
 
-
-
-
-
+.test.js
 [source,javascript]
 ----
+import matchesCriteria from "./overview/entity/Filter.js";
 
+mocha.setup('bdd');
+const assert = chai.assert;
+
+const webEvent = {
+    eventname: "Web Components",
+    description: "HTL Leonding Workshop",
+    link: "http://www.htl-leonding.at"
+
+};
+
+describe('#overview.entity.Filter', function () {
+    it('matchesCriteria_true_emptyEvent', function () {
+        assert.isTrue(matchesCriteria({},''));
+    });
+    it('matchesCriteria_true_webEvent_and_emptyFilter', function () {
+        assert.isTrue(matchesCriteria(webEvent,''));  // <.>
+    });
+})
+
+mocha.run();
 ----
 
+image:less037-two-tests.png[]
+
+
+
+==== matchesCriteria_true_webEvent_and_matchingFilter
+
+.test.js
 [source,javascript]
 ----
-
+    ...
+    it('matchesCriteria_true_webEvent_and_matchingFilter', function () {
+        assert.isTrue(matchesCriteria(webEvent,'http://www.htl-leonding.at'));
+    });
+    ...
 ----
 
-
-
-
-
-
-
+.Filter.js
 [source,javascript]
 ----
-
+const matchesCriteria = (event, filter) => {
+    console.log(event);
+    if (!filter) {
+        return true;
+    }
+    const values = Object.values(event);  // <.>
+    console.log(values); // <.>
+    return values.includes(filter); // <.>
+};
+export default matchesCriteria;
 ----
 
+
+image:less037-three-tests.png[]
+
+
+==== matchesCriteria_true_webEvent_and_partiallyMatchingFilter
+
+.test.js
 [source,javascript]
 ----
-
+...
+it('matchesCriteria_true_webEvent_and_partiallyMatchingFilter', function () {
+        assert.isTrue(matchesCriteria(webEvent,'leonding'));
+    });
+...
 ----
 
-
-
-
-
-
-
+.Filter.js
 [source,javascript]
 ----
-
+const matchesCriteria = (event, filter) => {
+    console.log(event);
+    if (!filter) {
+        return true;
+    }
+    const values = Object.values(event);
+    console.log(values);
+    const size = values.filter(value => value.includes(filter)).length;
+    return size >= 1;
+};
+export default matchesCriteria;
 ----
 
+image:less037-four-tests.png[]
+
+==== matchesCriteria_true_webEvent_and_partiallyMatchingFilter_ignoreCase
+
+
+.test.js
 [source,javascript]
 ----
-
+...
+it('matchesCriteria_true_webEvent_and_partiallyMatchingFilter_ignoreCase', function () {
+    assert.isTrue(matchesCriteria(webEvent,'leonding'));
+});
+...
 ----
 
+.Filter.js
+[source,javascript]
+----
+const matchesCriteria = (event, filter) => {
+    console.log(event);
+    if (!filter) {
+        return true;
+    }
+    const values = Object.values(event).map(v => v.toUpperCase()); // <.>
+    console.log(values);
+    const size = values.filter(value => value.includes(filter.toUpperCase())).length; // <.>
+    return size >= 1;
+};
+export default matchesCriteria;
+----
+
+image:less037-five-tests.png[]
 
 
 
